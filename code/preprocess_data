@@ -1,0 +1,36 @@
+import pandas as pd
+
+
+def select_process():
+    data_path = '../data/tmp_feature_raw.csv'
+    feature = pd.read_csv(data_path)
+    index = list(feature.columns.values)
+    dict_name = {}
+    type_list = []
+    for i, name in enumerate(index):
+        types = str(feature[name].dtype)
+        type_list.append(types)
+        dict_name[i] = name
+
+    object_name = []
+    for i, name in enumerate(type_list):
+        if name == 'float64':
+            object_name.append(dict_name[i])
+
+    get_out_matrix_1 = feature[object_name]
+    info_unique = get_out_matrix_1.nunique(axis=0).values
+    not_unique_name = []
+    for i, name in enumerate(info_unique):
+        if name != 1:
+            not_unique_name.append(object_name[i])
+
+    not_unique_name = not_unique_name[::-1]
+    not_unique_name.append(dict_name[0])
+    not_unique_name = not_unique_name[::-1]
+    get_out_matrix_2 = feature[not_unique_name]
+    get_out_matrix_2.dropna(axis=1, thresh=200, inplace=True)
+    get_out_matrix_2.to_csv('../data/tmp_feature_select.csv', index=False)
+
+
+if __name__ == '__main__':
+    select_process()
